@@ -19,7 +19,7 @@
         <h2>🔑 Faltao Hub Key</h2>
         <p>Valide ton accès pour récupérer ta clé du jour :</p>
         
-        <!-- Bouton pour lier le compte Discord (OAuth2) -->
+        <!-- Bouton pour lier le compte Discord -->
         <a id="discordBtn" href="#" class="btn">🔗 Se connecter avec Discord</a>
 
         <input type="text" id="keyInput" readonly placeholder="La clé apparaîtra ici...">
@@ -27,15 +27,15 @@
     </div>
 
     <script>
-        // Remplace par ton Client ID d'application Discord (dans le Portail Développeur Discord)
-        const CLIENT_ID = "TON_CLIENT_ID_DISCORD";
+        // Ton vrai Client ID Discord intégré
+        const CLIENT_ID = "1541444851961172100";
         // L'URL exacte de ta page GitHub Pages
         const REDIRECT_URI = "https://proculpa-sys.github.io/faltao-key/";
 
         // Lien de connexion OAuth2 Discord
         document.getElementById("discordBtn").href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds.join`;
 
-        // Génération de la clé du jour
+        // Génération de la clé du jour synchronisée
         function getDailyKey() {
             const now = new Date();
             const year = now.getUTCFullYear();
