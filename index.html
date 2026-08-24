@@ -55,14 +55,6 @@
             font-weight: 600;
         }
 
-        /* Style des boutons */
-        .btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 25px;
-        }
-
         .discord-btn {
             display: flex;
             align-items: center;
@@ -70,46 +62,19 @@
             gap: 10px;
             background-color: #5865F2;
             color: #ffffff;
-            padding: 12px 20px;
-            font-size: 15px;
+            padding: 14px 20px;
+            font-size: 16px;
             font-weight: 600;
             text-decoration: none;
             border-radius: 8px;
             transition: background-color 0.2s, transform 0.1s;
             box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+            margin-top: 20px;
         }
 
         .discord-btn:hover {
             background-color: #4752C4;
             transform: translateY(-2px);
-        }
-
-        .hwid-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background-color: #232733;
-            color: #a0a5b2;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            border-radius: 8px;
-            border: 1px solid #2f3542;
-            transition: all 0.2s;
-        }
-
-        .hwid-btn:hover {
-            background-color: #2f3542;
-            color: #ffffff;
-        }
-
-        #timer-msg {
-            font-size: 12px;
-            color: #e74c3c;
-            margin-top: 5px;
-            display: none;
         }
     </style>
 </head>
@@ -120,43 +85,14 @@
         <p>Ton accès a été validé avec succès.</p>
         
         <p>
-            <span class="highlight">Dernière étape :</span> Retourne sur le serveur Discord, va dans le salon des clés et clique sur <span class="highlight">Clé du Jour</span> pour récupérer ta clé !
+            <span class="highlight">Dernière étape :</span> Retourne sur le serveur Discord, va dans le salon dédié et utilise les boutons du bot pour récupérer ta clé, voir ton HWID ou demander un reset (disponible toutes les 24h).
         </p>
 
-        <div class="btn-container">
-            <!-- Bouton pour rejoindre le Discord -->
-            <a href="https://discord.gg/mPfryNY5vA" target="_blank" class="discord-btn">
-                Rejoindre le Discord 🚀
-            </a>
-
-            <!-- Bouton pour gérer le HWID / Reset (avec sécurité 24h) -->
-            <button id="hwidBtn" class="hwid-btn" onclick="handleHwidReset()">
-                🔄 Demander un Reset HWID (24h)
-            </button>
-            <span id="timer-msg">Un reset a déjà été demandé récemment. Veuillez patienter 24h.</span>
-        </div>
+        <!-- Gros bouton pour rejoindre le Discord -->
+        <a href="https://discord.gg/mPfryNY5vA" target="_blank" class="discord-btn">
+            Rejoindre le Discord 🚀
+        </a>
     </div>
-
-    <script>
-        function handleHwidReset() {
-            const lastReset = localStorage.getItem('last_hwid_reset');
-            const now = new Date().getTime();
-            const cooldownTime = 24 * 60 * 60 * 1000; // 24 heures en millisecondes
-
-            if (lastReset && (now - lastReset < cooldownTime)) {
-                // Le délai de 24h n'est pas encore écoulé
-                document.getElementById('timer-msg').style.display = 'block';
-            } else {
-                // Enregistre le nouveau reset et redirige vers le bot Discord ou effectue l'action
-                localStorage.setItem('last_hwid_reset', now);
-                document.getElementById('timer-msg').style.display = 'none';
-                
-                // Ici, tu peux rediriger vers la commande du bot Discord ou afficher un message de succès
-                alert("Demande de reset HWID prise en compte ! Redirection vers le bot Discord...");
-                window.location.href = "https://discord.gg/mPfryNY5vA";
-            }
-        }
-    </script>
 
 </body>
 </html>
