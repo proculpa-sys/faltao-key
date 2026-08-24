@@ -4,68 +4,49 @@
     <meta charset="UTF-8">
     <title>Faltao Hub - Générateur de Clé</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; text-align: center; padding-top: 50px; }
-        .box { background: #1e1e1e; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        input { padding: 10px; width: 300px; font-size: 16px; text-align: center; background: #2d2d2d; border: 1px solid #444; color: #fff; border-radius: 5px; margin-top: 10px; }
-        button { padding: 10px 20px; font-size: 16px; background: #7b2cbf; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 15px; }
-        button:hover { background: #9d4edd; }
+        body { background-color: #121212; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1e1e1e; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 350px; }
+        h2 { color: #9b59b6; margin-bottom: 10px; }
+        input { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; text-align: center; font-size: 14px; margin: 15px 0; box-sizing: border-box; }
+        button { background: #8e44ad; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:hover { background: #9b59b6; }
     </style>
 </head>
 <body>
     <div class="box">
-        <h2>🔑 Votre Clé Faltao Hub</h2>
-        <p>Voici votre clé générée (Valide 24 heures) :</p>
-        <input type="text" id="keyOutput" readonly value="Génération en cours...">
-        <br>
+        <h2>🔑 Faltao Hub Key</h2>
+        <p>Voici ta clé du jour (Valide 24h) :</p>
+        <input type="text" id="keyInput" readonly>
         <button onclick="copyKey()">Copier la clé</button>
     </div>
 
     <script>
-        const SUPABASE_URL = "https://cfpmnlbnccljosncrjca.supabase.co"; // Ex: https://xxxxx.supabase.co
-        const SUPABASE_KEY = "sb_publishable_t0w0igSVmZcByq5ZhepVsw_C_qO249q"; // Celle qui commence par sb_publishable_...
-
-        function generateRandomKey() {
-            return 'faltao_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
-        }
-
-        async function createAndSaveKey() {
-            const keyInput = document.getElementById("keyOutput");
-            const newKey = generateRandomKey();
-            const expiresAt = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
-
-            try {
-                let response = await fetch(`${SUPABASE_URL}/rest/v1/keys`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({
-                        key_code: newKey,
-                        expires_at: expiresAt
-                    })
-                });
-
-                if (response.ok) {
-                    keyInput.value = newKey;
-                } else {
-                    keyInput.value = "Erreur de génération !";
-                }
-            } catch (err) {
-                keyInput.value = "Erreur de connexion.";
+        // Fonction identique pour calculer la clé du jour (basée sur la date UTC)
+        function getDailyKey() {
+            const now = new Date();
+            const year = now.getUTCFullYear();
+            const month = now.getUTCMonth() + 1;
+            const day = now.getUTCDate();
+            
+            const rawString = `FaltaoSecretKey_${year}_${month}_${day}`;
+            
+            let hash = 0;
+            for (let i = 0; i < rawString.length; i++) {
+                hash = (hash * 31 + rawString.charCodeAt(i)) % 100000000;
             }
+            
+            return `FALTAO-${hash.toString(16).toUpperCase().padStart(8, '0')}`;
         }
+
+        const currentKey = getDailyKey();
+        document.getElementById("keyInput").value = currentKey;
 
         function copyKey() {
-            const copyText = document.getElementById("keyOutput");
-            copyText.select();
-            navigator.clipboard.writeText(copyText.value);
+            const input = document.getElementById("keyInput");
+            input.select();
+            navigator.clipboard.writeText(input.value);
             alert("Clé copiée ! Tu peux la coller dans le jeu.");
         }
-
-        createAndSaveKey();
     </script>
 </body>
 </html>
