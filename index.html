@@ -5,23 +5,37 @@
     <title>Faltao Hub - Générateur de Clé</title>
     <style>
         body { background-color: #121212; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #1e1e1e; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 350px; }
+        .box { background: #1e1e1e; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 380px; }
         h2 { color: #9b59b6; margin-bottom: 10px; }
         input { width: 100%; padding: 10px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; text-align: center; font-size: 14px; margin: 15px 0; box-sizing: border-box; }
-        button { background: #8e44ad; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-        button:hover { background: #9b59b6; }
+        .btn { background: #5865F2; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; text-decoration: none; display: inline-block; box-sizing: border-box; margin-top: 5px;}
+        .btn:hover { background: #4752C4; }
+        .btn-copy { background: #8e44ad; margin-top: 10px; }
+        .btn-copy:hover { background: #9b59b6; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>🔑 Faltao Hub Key</h2>
-        <p>Voici ta clé du jour (Valide 24h) :</p>
-        <input type="text" id="keyInput" readonly>
-        <button onclick="copyKey()">Copier la clé</button>
+        <p>Valide ton accès pour récupérer ta clé du jour :</p>
+        
+        <!-- Bouton pour lier le compte Discord (OAuth2) -->
+        <a id="discordBtn" href="#" class="btn">🔗 Se connecter avec Discord</a>
+
+        <input type="text" id="keyInput" readonly placeholder="La clé apparaîtra ici...">
+        <button class="btn btn-copy" onclick="copyKey()">Copier la clé</button>
     </div>
 
     <script>
-        // Fonction identique pour calculer la clé du jour (basée sur la date UTC)
+        // Remplace par ton Client ID d'application Discord (dans le Portail Développeur Discord)
+        const CLIENT_ID = "TON_CLIENT_ID_DISCORD";
+        // L'URL exacte de ta page GitHub Pages
+        const REDIRECT_URI = "https://proculpa-sys.github.io/faltao-key/";
+
+        // Lien de connexion OAuth2 Discord
+        document.getElementById("discordBtn").href = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds.join`;
+
+        // Génération de la clé du jour
         function getDailyKey() {
             const now = new Date();
             const year = now.getUTCFullYear();
@@ -29,17 +43,14 @@
             const day = now.getUTCDate();
             
             const rawString = `FaltaoSecretKey_${year}_${month}_${day}`;
-            
             let hash = 0;
             for (let i = 0; i < rawString.length; i++) {
                 hash = (hash * 31 + rawString.charCodeAt(i)) % 100000000;
             }
-            
-            return `FALTAO-${hash.toString(16).toUpperCase().padStart(8, '0')}`;
+            return `faltao_${hash.toString(16).toLowerCase().padStart(8, '0')}`;
         }
 
-        const currentKey = getDailyKey();
-        document.getElementById("keyInput").value = currentKey;
+        document.getElementById("keyInput").value = getDailyKey();
 
         function copyKey() {
             const input = document.getElementById("keyInput");
