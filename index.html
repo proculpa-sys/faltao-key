@@ -2,50 +2,43 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Faltao Hub - Générateur de Clé</title>
+    <title>Faltao Hub - Vérification Linkvertise</title>
     <style>
         body { background-color: #121212; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #1e1e1e; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 380px; }
-        h2 { color: #9b59b6; margin-bottom: 10px; }
-        p { color: #ccc; font-size: 14px; }
-        input { width: 100%; padding: 12px; background: #2c2c2c; border: 1px solid #444; color: white; border-radius: 5px; text-align: center; font-size: 16px; margin: 15px 0; box-sizing: border-box; font-weight: bold; letter-spacing: 1px; }
-        button { background: #8e44ad; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; font-size: 15px; }
-        button:hover { background: #9b59b6; }
+        .box { background: #1e1e1e; padding: 35px; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.6); width: 400px; }
+        h2 { color: #9b59b6; margin-bottom: 15px; }
+        p { color: #ccc; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
+        .btn { background: #5865F2; color: white; border: none; padding: 14px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; text-decoration: none; display: inline-block; box-sizing: border-box; font-size: 15px; transition: background 0.2s; }
+        .btn:hover { background: #4752C4; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>🔑 Faltao Hub Key</h2>
-        <p>Voici ta clé du jour (Valide 24h) :</p>
-        <input type="text" id="keyInput" readonly>
-        <button onclick="copyKey()">Copier la clé</button>
+    <div class="box" id="contentBox">
+        <h2>⚡ Faltao Hub — Vérification</h2>
+        <p>Merci d'avoir passé le lien Linkvertise ! Connecte-toi avec ton compte Discord pour valider ton accès et débloquer ta clé sur le serveur.</p>
+        
+        <!-- Bouton de connexion Discord OAuth2 -->
+        <a id="discordBtn" href="#" class="btn">🔗 Se connecter avec Discord</a>
     </div>
 
     <script>
-        // Fonction mathématique pour générer la clé du jour synchronisée
-        function getDailyKey() {
-            const now = new Date();
-            const year = now.getUTCFullYear();
-            const month = now.getUTCMonth() + 1;
-            const day = now.getUTCDate();
-            
-            const rawString = `FaltaoSecretKey_${year}_${month}_${day}`;
-            let hash = 0;
-            for (let i = 0; i < rawString.length; i++) {
-                hash = (hash * 31 + rawString.charCodeAt(i)) % 100000000;
-            }
-            return `faltao_${hash.toString(16).toLowerCase().padStart(8, '0')}`;
-        }
+        const CLIENT_ID = "1541444851961172100"; // Ton Client ID
+        const REDIRECT_URI = "https://proculpa-sys.github.io/faltao-key/"; // Ton URL GitHub Pages
 
-        // Affiche la clé dans l'input dès le chargement de la page
-        const currentKey = getDailyKey();
-        document.getElementById("keyInput").value = currentKey;
+        // Génère le lien d'autorisation avec l'option guilds.join pour l'ajouter au serveur et lui donner le rôle
+        const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds.join`;
+        document.getElementById("discordBtn").href = authUrl;
 
-        function copyKey() {
-            const input = document.getElementById("keyInput");
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            alert("Clé copiée ! Tu peux la coller dans le jeu.");
+        // Vérifie si Discord vient de rediriger l'utilisateur après l'autorisation
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get("access_token");
+
+        if (accessToken) {
+            // L'utilisateur vient de valider ! On change l'affichage de la page
+            document.getElementById("contentBox").innerHTML = `
+                <h2 style="color: #2ecc71;">✅ Vérification Réussie !</h2>
+                <p>Ton accès a été validé avec succès.<br><br><b>Dernière étape :</b> Retourne sur le serveur Discord, va dans le salon des clés et clique sur <b>Clé du Jour</b> pour récupérer ta clé !</p>
+            `;
         }
     </script>
 </body>
