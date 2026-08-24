@@ -2,44 +2,161 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Faltao Hub - Vérification Linkvertise</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faltao Hub - Vérification</title>
     <style>
-        body { background-color: #121212; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #1e1e1e; padding: 35px; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.6); width: 400px; }
-        h2 { color: #9b59b6; margin-bottom: 15px; }
-        p { color: #ccc; font-size: 14px; line-height: 1.5; margin-bottom: 25px; }
-        .btn { background: #5865F2; color: white; border: none; padding: 14px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; text-decoration: none; display: inline-block; box-sizing: border-box; font-size: 15px; transition: background 0.2s; }
-        .btn:hover { background: #4752C4; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0f1115;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .success-card {
+            background-color: #181b22;
+            border: 1px solid #232733;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            color: #2ecc71;
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        p {
+            color: #a0a5b2;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .highlight {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Style des boutons */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .discord-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #5865F2;
+            color: #ffffff;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+        }
+
+        .discord-btn:hover {
+            background-color: #4752C4;
+            transform: translateY(-2px);
+        }
+
+        .hwid-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: #232733;
+            color: #a0a5b2;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #2f3542;
+            transition: all 0.2s;
+        }
+
+        .hwid-btn:hover {
+            background-color: #2f3542;
+            color: #ffffff;
+        }
+
+        #timer-msg {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="box" id="contentBox">
-        <h2>⚡ Faltao Hub — Vérification</h2>
-        <p>Merci d'avoir passé le lien Linkvertise ! Connecte-toi avec ton compte Discord pour valider ton accès et débloquer ta clé sur le serveur.</p>
+
+    <div class="success-card">
+        <h2>✅ Vérification Réussie !</h2>
+        <p>Ton accès a été validé avec succès.</p>
         
-        <!-- Bouton de connexion Discord OAuth2 -->
-        <a id="discordBtn" href="#" class="btn">🔗 Se connecter avec Discord</a>
+        <p>
+            <span class="highlight">Dernière étape :</span> Retourne sur le serveur Discord, va dans le salon des clés et clique sur <span class="highlight">Clé du Jour</span> pour récupérer ta clé !
+        </p>
+
+        <div class="btn-container">
+            <!-- Bouton pour rejoindre le Discord -->
+            <a href="https://discord.gg/mPfryNY5vA" target="_blank" class="discord-btn">
+                Rejoindre le Discord 🚀
+            </a>
+
+            <!-- Bouton pour gérer le HWID / Reset (avec sécurité 24h) -->
+            <button id="hwidBtn" class="hwid-btn" onclick="handleHwidReset()">
+                🔄 Demander un Reset HWID (24h)
+            </button>
+            <span id="timer-msg">Un reset a déjà été demandé récemment. Veuillez patienter 24h.</span>
+        </div>
     </div>
 
     <script>
-        const CLIENT_ID = "1541444851961172100"; // Ton Client ID
-        const REDIRECT_URI = "https://proculpa-sys.github.io/faltao-key/"; // Ton URL GitHub Pages
+        function handleHwidReset() {
+            const lastReset = localStorage.getItem('last_hwid_reset');
+            const now = new Date().getTime();
+            const cooldownTime = 24 * 60 * 60 * 1000; // 24 heures en millisecondes
 
-        // Génère le lien d'autorisation avec l'option guilds.join pour l'ajouter au serveur et lui donner le rôle
-        const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify%20guilds.join`;
-        document.getElementById("discordBtn").href = authUrl;
-
-        // Vérifie si Discord vient de rediriger l'utilisateur après l'autorisation
-        const fragment = new URLSearchParams(window.location.hash.slice(1));
-        const accessToken = fragment.get("access_token");
-
-        if (accessToken) {
-            // L'utilisateur vient de valider ! On change l'affichage de la page
-            document.getElementById("contentBox").innerHTML = `
-                <h2 style="color: #2ecc71;">✅ Vérification Réussie !</h2>
-                <p>Ton accès a été validé avec succès.<br><br><b>Dernière étape :</b> Retourne sur le serveur Discord, va dans le salon des clés et clique sur <b>Clé du Jour</b> pour récupérer ta clé !</p>
-            `;
+            if (lastReset && (now - lastReset < cooldownTime)) {
+                // Le délai de 24h n'est pas encore écoulé
+                document.getElementById('timer-msg').style.display = 'block';
+            } else {
+                // Enregistre le nouveau reset et redirige vers le bot Discord ou effectue l'action
+                localStorage.setItem('last_hwid_reset', now);
+                document.getElementById('timer-msg').style.display = 'none';
+                
+                // Ici, tu peux rediriger vers la commande du bot Discord ou afficher un message de succès
+                alert("Demande de reset HWID prise en compte ! Redirection vers le bot Discord...");
+                window.location.href = "https://discord.gg/mPfryNY5vA";
+            }
         }
     </script>
+
 </body>
 </html>
